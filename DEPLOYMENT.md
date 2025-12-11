@@ -17,7 +17,7 @@ cd ~/strudel
 
 ```bash
 # Download the compose file
-curl -O https://raw.githubusercontent.com/The-Alphabet-Cartel/strudel-docker/main/docker-compose.yml
+curl -O https://raw.githubusercontent.com/The-Alphabet-Cartel/strudel-docker/master/docker-compose.yml
 
 # Or create it manually (see content below)
 ```
