@@ -1,0 +1,57 @@
+# Git files
+.git
+.gitignore
+.gitattributes
+
+# Docker files
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Documentation
+README.md
+*.md
+
+# Node modules (will be installed in container)
+node_modules
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
+
+# IDE files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build artifacts (if any)
+dist
+build
+.next
+out
+
+# Test files
+test
+tests
+__tests__
+*.test.js
+*.spec.js
+
+# CI/CD files
+.github
+.gitlab-ci.yml
+.travis.yml
+
+# Logs
+logs
+*.log
+
+# Environment files (should be configured separately)
+.env
+.env.*
+!.env.example
