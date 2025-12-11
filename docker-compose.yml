@@ -3,7 +3,7 @@ services:
     container_name: strudel
     image: ghcr.io/the-alphabet-cartel/strudel-docker:latest
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
       - HOST=0.0.0.0
     restart: unless-stopped
     networks:
