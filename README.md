@@ -19,7 +19,7 @@ Quick start:
 mkdir ~/strudel && cd ~/strudel
 
 # Download docker-compose.yml
-curl -O https://raw.githubusercontent.com/The-Alphabet-Cartel/strudel-docker/main/docker-compose.yml
+curl -O https://raw.githubusercontent.com/The-Alphabet-Cartel/strudel-docker/master/docker-compose.yml
 
 #Start Strudel
 docker compose up -d
