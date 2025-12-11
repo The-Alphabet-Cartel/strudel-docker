@@ -1,4 +1,4 @@
-FROM node:20-slim AS base
+FROM node:24-slim AS base
 
 # Install pnpm
 RUN npm install -g pnpm
@@ -22,7 +22,7 @@ COPY strudel/ ./
 # RUN pnpm build
 
 # Production stage
-FROM node:20-slim AS runner
+FROM node:24-slim AS runner
 WORKDIR /app
 
 # Install pnpm
