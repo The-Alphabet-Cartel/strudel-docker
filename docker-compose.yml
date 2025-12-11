@@ -2,8 +2,6 @@ services:
   strudel:
     container_name: strudel
     image: ghcr.io/the-alphabet-cartel/strudel-docker:latest
-    ports:
-      - "4321:4321"
     environment:
       - NODE_ENV=production
       - HOST=0.0.0.0
@@ -15,14 +13,14 @@ services:
     container_name: strudel-proxy
     image: nginx:alpine
     ports:
-      - "80:80"
+      - 80:80
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
-    depends_on:
-      - strudel
     restart: unless-stopped
     networks:
       - strudel-network
+    depends_on:
+      - strudel
       
 networks:
   strudel-network:
