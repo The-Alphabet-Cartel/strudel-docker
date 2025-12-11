@@ -6,13 +6,15 @@ WORKDIR /app
 # Install pnpm
 RUN npm install pnpm --global
 
-# Copy package files
-COPY pnpm-workspace.yaml ./
-COPY package.json pnpm-lock.yaml ./
-COPY packages/ ./packages/
-COPY examples/ ./examples/
+# Create needed directories
 RUN mkdir -p website/public
-COPY website/package.json ./website/
+
+# Copy package files
+COPY ./strudel/pnpm-workspace.yaml ./
+COPY ./strudel/package.json ./strudel/pnpm-lock.yaml ./
+COPY ./strudel/packages/ ./packages/
+COPY ./strudel/examples/ ./examples/
+COPY ./strudel/website/package.json ./website/
 
 # Install
 RUN pnpm install
