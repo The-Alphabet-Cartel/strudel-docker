@@ -1,5 +1,13 @@
 FROM node:20-slim AS base
 
+# Install build dependencies for native modules
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
 # Install pnpm
 RUN npm install -g pnpm
 
@@ -17,6 +25,14 @@ RUN pnpm install --frozen-lockfile
 
 # Production stage
 FROM node:20-slim AS runner
+
+# Install runtime dependencies and build tools (needed for node-gyp at runtime)
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 # Install pnpm in final image
