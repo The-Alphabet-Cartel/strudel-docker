@@ -15,9 +15,7 @@ RUN npm install -g pnpm
 WORKDIR /app
 
 # Copy package files from the entire monorepo
-COPY strudel/package.json strudel/pnpm-lock.yaml strudel/pnpm-workspace.yaml ./
-COPY strudel/packages ./packages
-COPY strudel/website ./website
+COPY ./strudel ./
 
 # Install ALL dependencies for the entire workspace
 FROM base AS deps
