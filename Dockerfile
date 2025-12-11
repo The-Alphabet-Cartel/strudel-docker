@@ -10,16 +10,15 @@ RUN npm install pnpm --global
 RUN mkdir -p website/public
 
 # Copy package files
-COPY ./strudel/pnpm-workspace.yaml ./
-COPY ./strudel/package.json ./strudel/pnpm-lock.yaml ./
-COPY ./strudel/packages/ ./packages/
-COPY ./strudel/examples/ ./examples/
-COPY ./strudel/website/package.json ./website/
+COPY ./strudel ./
+#COPY ./strudel/package.json ./strudel/pnpm-lock.yaml ./
+#COPY ./strudel/packages/ ./packages/
+#COPY ./strudel/examples/ ./examples/
+#COPY ./strudel/website/package.json ./website/
 
 # Install
 RUN pnpm install
 
-# Copy everything
 COPY . .
 
 # Expose the port Strudel runs on
