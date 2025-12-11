@@ -1,77 +1,49 @@
-name: Build and Push Docker Image
+# Build Dependencies Note
 
-on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'Dockerfile'
-      - 'strudel/**'
-      - '.github/workflows/docker-build.yml'
-  pull_request:
-    branches:
-      - main
-  workflow_dispatch:  # Allow manual trigger
-  schedule:
-    # Rebuild weekly on Sunday at 2am UTC to pick up submodule updates
-    - cron: '0 2 * * 0'
+## Native Module Dependencies
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+Strudel requires native modules (tree-sitter, tree-sitter-haskell) that need to be compiled during installation. These require:
 
-jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
+- Python 3
+- make
+- g++ (C++ compiler)
+- git
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive  # Important: fetch submodules
+The updated Dockerfile now includes these dependencies.
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+## If You See Python/node-gyp Errors
 
-      - name: Log in to GitHub Container Registry
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+If you see errors like:
+```
+gyp ERR! find Python
+gyp ERR! stack Error: Could not find any Python installation to use
+```
 
-      - name: Extract metadata for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            # Tag with 'latest' on main branch
-            type=raw,value=latest,enable={{is_default_branch}}
-            # Tag with short commit SHA
-            type=sha,prefix={{branch}}-
-            # Tag with branch name
-            type=ref,event=branch
-            # Tag with PR number
-            type=ref,event=pr
-            # Tag with date
-            type=raw,value={{date 'YYYYMMDD'}}
+This means the Docker image doesn't have the build tools installed. The updated Dockerfile fixes this by installing:
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./Dockerfile
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          platforms: linux/amd64,linux/arm64
+```dockerfile
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+```
 
-      - name: Image digest
-        run: echo ${{ steps.docker_build.outputs.digest }}
+## Image Size Impact
+
+Adding build dependencies increases the image size:
+- Base node:20-slim: ~200 MB
+- With build tools: ~450-500 MB
+
+This is necessary for Strudel's native dependencies to compile correctly.
+
+## Alternative: Pre-built Binaries
+
+Once the GitHub Actions workflow builds and publishes the image with these dependencies, you can use the pre-built image which will already have everything compiled:
+
+```yaml
+image: ghcr.io/the-alphabet-cartel/strudel-docker:latest
+```
+
+This avoids needing to build anything locally.
