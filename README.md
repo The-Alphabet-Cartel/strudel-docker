@@ -6,66 +6,31 @@ Docker configuration for running the Strudel music live coding environment on yo
 
 - Docker installed on your Debian server
 - Docker Compose installed
-- The Strudel repository cloned from GitHub
 
-## Setup Instructions
+## Deployment
 
-### 1. Clone the Repository Structure
+**Quick, easy, no repository cloning needed.**
 
-On your LOFN server, create a directory for Strudel:
+See [DEPLOYMENT.md](DEPLOYMENT.md) for complete instructions.
 
+Quick start:
 ```bash
-mkdir -p ~/strudel-docker
-cd ~/strudel-docker
+# Create the Strudel Directory
+mkdir ~/strudel && cd ~/strudel
+
+# Download docker-compose.yml
+curl -O https://raw.githubusercontent.com/The-Alphabet-Cartel/strudel-docker/main/docker-compose.yml
+
+#Start Strudel
+docker compose up -d
 ```
 
-### 2. Clone Your Forked Strudel Repository
-
-```bash
-git clone https://github.com/The-Alphabet-Cartel/strudel.git
-```
-
-Your directory structure should look like:
-```
-~/strudel-docker/
-├── docker-compose.yml
-├── docker-compose.production.yml
-├── Dockerfile
-├── README.md
-└── strudel/          (the cloned repository)
-```
-
-### 3. Choose Your Setup
-
-#### Option A: Quick Development Setup (Recommended for Testing)
-
-Uses the simple docker-compose.yml without building a custom image:
-
-```bash
-# Start the container
-docker-compose up -d
-
-# View logs
-docker-compose logs -f
-
-# Stop the container
-docker-compose down
-```
-
-#### Option B: Production Setup with Custom Build
-
-Uses the Dockerfile for an optimized image:
-
-```bash
-# Build and start
-docker-compose -f docker-compose.production.yml up -d --build
-
-# View logs
-docker-compose -f docker-compose.production.yml logs -f
-
-# Stop
-docker-compose -f docker-compose.production.yml down
-```
+Benefits:
+- ✅ Fastest deployment (< 1 minute)
+- ✅ Minimal disk space (~500 MB)
+- ✅ No build dependencies
+- ✅ Easy updates with `docker compose pull`
+- ✅ Automatically built via GitHub Actions
 
 ## Accessing Strudel
 
@@ -88,7 +53,7 @@ ports:
 
 ### Resource Limits
 
-The production setup includes resource limits. Adjust in `docker-compose.production.yml`:
+The production setup includes resource limits. Adjust in `docker-compose.yml`:
 
 ```yaml
 deploy:
@@ -100,22 +65,22 @@ deploy:
 
 ## Updating Strudel
 
-To update to the latest version:
+To update to the latest version from your fork:
 
 ```bash
-cd ~/strudel-docker/strudel
-git pull origin main
+cd ~/strudel-docker
+
+# Update the submodule to latest commit
+git submodule update --remote strudel
+
+# Commit the submodule update
+git add strudel
+git commit -m "Update Strudel to latest version"
 
 # Restart the containers
-cd ..
 docker-compose down
+docker-compose pull
 docker-compose up -d
-```
-
-For production setup:
-```bash
-docker-compose -f docker-compose.production.yml down
-docker-compose -f docker-compose.production.yml up -d --build
 ```
 
 ## Troubleshooting
@@ -123,7 +88,7 @@ docker-compose -f docker-compose.production.yml up -d --build
 ### Container won't start
 ```bash
 # Check logs
-docker-compose logs
+docker compose logs strudel
 
 # Check if port is already in use
 sudo netstat -tlnp | grep 4321
@@ -135,39 +100,48 @@ sudo netstat -tlnp | grep 4321
 sudo chown -R $USER:$USER ~/strudel-docker/strudel
 ```
 
-### Clear cache and rebuild
+### Clear cache and restart
 ```bash
-docker-compose down -v
-docker-compose up -d --build
+docker compose down -v
+docker compose pull
+docker compose up -d
 ```
-
-## Server Specifications
-
-Your LOFN server specs:
-- CPU: Ryzen 7 5800x (8 cores / 16 threads)
-- RAM: 64GB
-- OS: Debian Linux
-- Docker-based hosting platform
-
-This configuration is optimized for these specifications.
 
 ## Additional Commands
 
 ```bash
-# Enter the running container
-docker-compose exec strudel sh
-
 # View container resource usage
-docker stats strudel-app
-
-# Rebuild without cache
-docker-compose build --no-cache
-docker-compose up -d
+docker stats strudel
 ```
 
 ## License
 
 Strudel is licensed under GNU AGPL-3.0. See the LICENSE file in the strudel directory.
+
+## Automated Builds
+
+Docker images are automatically built and published to GitHub Container Registry via GitHub Actions when:
+
+- Code is pushed to the `main` branch
+- Dockerfile or submodule is updated
+- Weekly on Sundays at 2am UTC (to pick up Strudel updates)
+- Manually triggered via GitHub Actions
+
+### GitHub Actions Workflow
+
+The `.github/workflows/docker-build.yml` workflow:
+1. Checks out the repository with submodules
+2. Builds the Docker image for multiple platforms (amd64, arm64)
+3. Pushes to `ghcr.io/the-alphabet-cartel/strudel-docker`
+4. Tags with `latest`, commit SHA, and date
+
+### Making Images Public
+
+To allow pulling without authentication:
+
+1. Go to: https://github.com/orgs/The-Alphabet-Cartel/packages
+2. Select the `strudel-docker` package
+3. Package settings → Change visibility → Public
 
 ## Support
 
