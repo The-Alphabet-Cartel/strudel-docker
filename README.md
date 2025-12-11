@@ -38,13 +38,13 @@ Once running, access Strudel at:
 - **Local**: http://localhost:4321
 - **Network**: http://YOUR_SERVER_IP:4321
 
-Replace `YOUR_SERVER_IP` with your LOFN server's IP address.
+Replace `YOUR_SERVER_IP` with your server's IP address.
 
 ## Configuration
 
 ### Port Configuration
 
-If port 4321 is already in use, modify the port mapping in docker-compose.yml:
+If port 4321 is already in use, modify the port mapping in `docker-compose.yml`:
 
 ```yaml
 ports:
@@ -63,26 +63,6 @@ deploy:
       memory: 4G     # Maximum memory
 ```
 
-## Updating Strudel
-
-To update to the latest version from your fork:
-
-```bash
-cd ~/strudel-docker
-
-# Update the submodule to latest commit
-git submodule update --remote strudel
-
-# Commit the submodule update
-git add strudel
-git commit -m "Update Strudel to latest version"
-
-# Restart the containers
-docker-compose down
-docker-compose pull
-docker-compose up -d
-```
-
 ## Troubleshooting
 
 ### Container won't start
@@ -94,13 +74,8 @@ docker compose logs strudel
 sudo netstat -tlnp | grep 4321
 ```
 
-### Permission issues
-```bash
-# Ensure proper ownership
-sudo chown -R $USER:$USER ~/strudel-docker/strudel
-```
-
 ### Clear cache and restart
+
 ```bash
 docker compose down -v
 docker compose pull
@@ -126,22 +101,6 @@ Docker images are automatically built and published to GitHub Container Registry
 - Dockerfile or submodule is updated
 - Weekly on Sundays at 2am UTC (to pick up Strudel updates)
 - Manually triggered via GitHub Actions
-
-### GitHub Actions Workflow
-
-The `.github/workflows/docker-build.yml` workflow:
-1. Checks out the repository with submodules
-2. Builds the Docker image for multiple platforms (amd64, arm64)
-3. Pushes to `ghcr.io/the-alphabet-cartel/strudel-docker`
-4. Tags with `latest`, commit SHA, and date
-
-### Making Images Public
-
-To allow pulling without authentication:
-
-1. Go to: https://github.com/orgs/The-Alphabet-Cartel/packages
-2. Select the `strudel-docker` package
-3. Package settings → Change visibility → Public
 
 ## Support
 
