@@ -1,36 +1,35 @@
-version: '3.8'
-
 services:
   strudel:
     container_name: strudel-app
-    image: node:20-slim
-    working_dir: /app
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "4321:4321"
     volumes:
-      # Mount the strudel repository
+      # Optional: Mount for live code editing during development
+      # Uncomment the line below if you want hot-reloading
       - ./strudel:/app
-      # Cache for pnpm to speed up builds
-      - pnpm-store:/root/.local/share/pnpm/store
-    environment:
-      - NODE_ENV=development
-      # Allow access from external hosts (important for Docker)
-      - HOST=0.0.0.0
-    command: >
-      sh -c "
-        echo 'Installing pnpm...' &&
-        npm install -g pnpm &&
-        echo 'Installing dependencies...' &&
-        pnpm install &&
-        echo 'Starting Strudel dev server...' &&
-        pnpm dev --host 0.0.0.0
-      "
+      
+      # Persistent volume for user data (if needed)
+      - strudel-data:/app/data
+    env_file:
+      - .env
     restart: unless-stopped
     networks:
       - strudel-network
+    # Resource limits (adjust based on your Ryzen 7 5800x with 64GB RAM)
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 4G
+        reservations:
+          cpus: '2'
+          memory: 2G
 
 volumes:
-  pnpm-store:
+  strudel-data:
     driver: local
 
 networks:
